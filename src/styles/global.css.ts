@@ -1,9 +1,10 @@
 import { createGlobalStyle } from "styled-components";
+import { Inter } from "next/font/google";
+
+
+const inter = Inter({ subsets: ["latin"] });
 
 const Global = createGlobalStyle`
-  @import "tailwindcss/base";
-  @import "tailwindcss/components";
-  @import "tailwindcss/utilities";
   
   /* http://meyerweb.com/eric/tools/css/reset/ 
     v2.0 | 20110126
@@ -37,6 +38,8 @@ const Global = createGlobalStyle`
   }
   body {
     line-height: 1;
+    font-family: ${inter.style.fontFamily};
+    color: var(--primary);
   }
   ol, ul {
     list-style: none;
@@ -52,6 +55,15 @@ const Global = createGlobalStyle`
   table {
     border-collapse: collapse;
     border-spacing: 0;
+  }
+
+  /**
+  * Global Vars
+  */
+
+  :root {
+    --layout-padding: 112px;
+    --primary: rgba(148, 47, 112, 1);
   }
 
 `;
