@@ -19,6 +19,9 @@ import styled from "styled-components";
 export default function Home() {
   const methods = useForm<IEvent>({
     defaultValues: {
+      capacity: 5,
+      price: 1000,
+      startAt: new Date().toISOString(),
       title: "Untitle Event",
       tags: [],
     },
@@ -55,6 +58,14 @@ export default function Home() {
     onCloseModal();
   };
 
+  const onDateChange = (date: Date) => {
+    methods.setValue("startAt", date.toISOString());
+  };
+
+  const onSelectPrivacy = (privacy: string) => {
+    methods.setValue('privacy', privacy)
+  }
+
   /**
    * SIDE EFFECTS
    */
@@ -84,13 +95,32 @@ export default function Home() {
             </EditableDiv>
 
             <div className="mt-3 flex flex-row">
-              <div className="flex justify-center items-center w-11 h-11 bg-[var(--primary)]">
-                <BsFillCalendarDateFill color="white" />
+              <div className="flex-1 flex">
+                <div className="flex justify-center items-center w-11 h-11 bg-[var(--primary)]">
+                  <BsFillCalendarDateFill color="white" />
+                </div>
+                <DatePicker
+                  className="h-[42px] pl-3"
+                  selected={new Date(values.startAt)}
+                  dateFormat="dd-MM-yyyy"
+                  onChange={onDateChange}
+                />
               </div>
-              <DatePicker onChange={() => {}} />
 
-              <div className="flex justify-center ml-4 items-center w-11 h-11 bg-[var(--primary)]">
-                <IoIosTime color="white" />
+              <div className="flex-1 flex">
+                <div className="flex justify-center ml-4 items-center w-11 h-11 bg-[var(--primary)]">
+                  <IoIosTime color="white" />
+                </div>
+                <DatePicker
+                  className="h-[42px] pl-3"
+                  selected={new Date(values.startAt)}
+                  onChange={onDateChange}
+                  showTimeSelect
+                  showTimeSelectOnly
+                  timeIntervals={15}
+                  timeCaption="Time"
+                  dateFormat="h:mm aa"
+                />
               </div>
             </div>
 
@@ -141,6 +171,7 @@ export default function Home() {
                 type="checkbox"
                 className="mb-4"
                 label="I want to approve attendees"
+                {...methods.register('isManualApprove')}
               />
 
               <p className="text-lg mb-3 font-bold">Privacy</p>
@@ -151,6 +182,8 @@ export default function Home() {
                     type="radio"
                     className="mr-4"
                     label={(PRIVACY as any)[privacyType] as string}
+                    onClick={() => onSelectPrivacy((PRIVACY as any)[privacyType] as string)}
+                    checked={values.privacy === (PRIVACY as any)[privacyType] as string}
                   />
                 ))}
               </div>

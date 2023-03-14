@@ -31,7 +31,7 @@ const Tag = ({
     <Container
       selected={selected}
       onClick={innerOnClick}
-      className={`rounded-full bg-[#f2f4f7] hover:bg-[#e7e9eb] px-3 py-2 flex justify-center transition-all items-center ${className}`}
+      className={`rounded-full bg-[#f2f4f7] hover:bg-[#e7e9eb] cursor-pointer px-3 py-2 flex justify-center transition-all items-center ${className}`}
     >
       {children}
       {closeable && (

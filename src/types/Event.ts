@@ -9,6 +9,6 @@ export interface IEvent {
   description: string;
   banner: string;
   tags: string[];
-  privacy: PRIVACY;
+  privacy: string;
   isManualApprove?: boolean;
 }
