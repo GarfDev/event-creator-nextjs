@@ -1,16 +1,17 @@
 import { BannerPickModal, Tag } from "@/components";
 import CountrySelect from "@/components/CountrySelect";
-import DatePicker from "react-datepicker";
 import Layout from "@/components/Layout";
+import instance from "@/configs/axios";
 import { AVAILABLE_TAGS } from "@/constants/AVAILABLE_TAGS";
 import { PRIVACY } from "@/constants/PRIVACY";
 import { IEvent } from "@/types/Event";
 import Head from "next/head";
 import { useState } from "react";
+import Toast from "react-bootstrap/Toast";
 import Form from "react-bootstrap/Form";
+import DatePicker from "react-datepicker";
 import { useForm } from "react-hook-form";
-import { BsFillImageFill } from "react-icons/bs";
-import { BsFillCalendarDateFill } from "react-icons/bs";
+import { BsFillCalendarDateFill, BsFillImageFill } from "react-icons/bs";
 import { FaMoneyBillWaveAlt } from "react-icons/fa";
 import { IoIosTime } from "react-icons/io";
 import { MdGroups, MdOutlineLanguage } from "react-icons/md";
@@ -27,6 +28,7 @@ export default function Home() {
     },
   });
 
+  const [toastMessage, setToastMessage] = useState('')
   const [modal, setModal] = useState<HOME_MODAL>(HOME_MODAL.NONE);
   const values = methods.watch();
 
@@ -63,8 +65,20 @@ export default function Home() {
   };
 
   const onSelectPrivacy = (privacy: string) => {
-    methods.setValue('privacy', privacy)
-  }
+    methods.setValue("privacy", privacy);
+  };
+
+  const clearToast = () => setToastMessage('')
+
+  const onSubmit = async () => {
+    /* TO-DO: Change this one to more proper API handle lib like React-Query */
+    try {
+      const response = await instance.post("/interview/social", values);
+      setToastMessage('Successfully created your Event.')
+    } catch (e) {
+      setToastMessage('Error while creating this Event, please contact administration for more info.')
+    }
+  };
 
   /**
    * SIDE EFFECTS
@@ -171,7 +185,7 @@ export default function Home() {
                 type="checkbox"
                 className="mb-4"
                 label="I want to approve attendees"
-                {...methods.register('isManualApprove')}
+                {...methods.register("isManualApprove")}
               />
 
               <p className="text-lg mb-3 font-bold">Privacy</p>
@@ -182,8 +196,13 @@ export default function Home() {
                     type="radio"
                     className="mr-4"
                     label={(PRIVACY as any)[privacyType] as string}
-                    onClick={() => onSelectPrivacy((PRIVACY as any)[privacyType] as string)}
-                    checked={values.privacy === (PRIVACY as any)[privacyType] as string}
+                    onChange={() =>
+                      onSelectPrivacy((PRIVACY as any)[privacyType] as string)
+                    }
+                    checked={
+                      values.privacy ===
+                      ((PRIVACY as any)[privacyType] as string)
+                    }
                   />
                 ))}
               </div>
@@ -225,10 +244,18 @@ export default function Home() {
                 ))}
               </div>
             </div>
-            <button className="px-2 py-3 flex items-center mb-11 justify-center w-full rounded-2xl bg-[#FEF452]">
+            <button
+              onClick={onSubmit}
+              className="px-2 py-3 flex items-center mb-11 justify-center w-full rounded-2xl bg-[#FEF452]"
+            >
               CREATE SOCIAL
             </button>
+
+            <Toast show={!!toastMessage} onClose={clearToast} animation className="fixed top-3 right-3">
+              <Toast.Body>{toastMessage}</Toast.Body>
+            </Toast>
           </div>
+
           <div className="flex-1">
             <div
               style={{
