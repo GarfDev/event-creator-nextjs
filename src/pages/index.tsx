@@ -1,11 +1,12 @@
-import { Tag } from "@/components";
+import { BannerPickModal, Tag } from "@/components";
 import CountrySelect from "@/components/CountrySelect";
-import DateInput from "@/components/DateInput";
+import DatePicker from "react-datepicker";
 import Layout from "@/components/Layout";
 import { AVAILABLE_TAGS } from "@/constants/AVAILABLE_TAGS";
 import { PRIVACY } from "@/constants/PRIVACY";
 import { IEvent } from "@/types/Event";
 import Head from "next/head";
+import { useState } from "react";
 import Form from "react-bootstrap/Form";
 import { useForm } from "react-hook-form";
 import { BsFillImageFill } from "react-icons/bs";
@@ -15,8 +16,6 @@ import { IoIosTime } from "react-icons/io";
 import { MdGroups, MdOutlineLanguage } from "react-icons/md";
 import styled from "styled-components";
 
-export const HEIGHT_LIMIT = 200;
-
 export default function Home() {
   const methods = useForm<IEvent>({
     defaultValues: {
@@ -25,6 +24,7 @@ export default function Home() {
     },
   });
 
+  const [modal, setModal] = useState<HOME_MODAL>(HOME_MODAL.NONE);
   const values = methods.watch();
 
   /**
@@ -44,6 +44,15 @@ export default function Home() {
   const onRemoveTag = (toRemove: string) => {
     const nextTags = values.tags.filter((item) => item === toRemove);
     methods.setValue("tags", nextTags);
+  };
+
+  const onToggleBanner = () => setModal(HOME_MODAL.BANNER);
+
+  const onCloseModal = () => setModal(HOME_MODAL.NONE);
+
+  const onSaveBanner = (banner: string) => {
+    methods.setValue("banner", banner);
+    onCloseModal();
   };
 
   /**
@@ -78,16 +87,11 @@ export default function Home() {
               <div className="flex justify-center items-center w-11 h-11 bg-[var(--primary)]">
                 <BsFillCalendarDateFill color="white" />
               </div>
-              <DateInput
-                onChange={(dateStr) => methods.setValue("startAt", dateStr)}
-              />
+              <DatePicker onChange={() => {}} />
 
               <div className="flex justify-center ml-4 items-center w-11 h-11 bg-[var(--primary)]">
                 <IoIosTime color="white" />
               </div>
-              <DateInput
-                onChange={(dateStr) => methods.setValue("startAt", dateStr)}
-              />
             </div>
 
             {/** COUNTRY SELECT */}
@@ -195,14 +199,28 @@ export default function Home() {
           <div className="flex-1">
             <div
               style={{
-                background:
-                  "linear-gradient(rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.2))",
+                border: !values.banner ? "white 2px dashed" : "",
+                backgroundPosition: "center",
+                background: !values.banner
+                  ? "linear-gradient(rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.2))"
+                  : `url(${values.banner})`,
               }}
-              className="border-white border-2 border-dashed w-full h-[400px] rounded-tr-[64px] rounded-bl-[64px] flex items-center cursor-pointer justify-center m-4"
+              className="w-full h-[400px] rounded-tr-[64px] rounded-bl-[64px] flex items-center cursor-pointer justify-center m-4"
+              onClick={onToggleBanner}
             >
-              <BsFillImageFill />
-              <span className="ml-2">Add a banner</span>
+              {!values.banner && (
+                <>
+                  <BsFillImageFill />
+                  <span className="ml-2">Add a banner</span>
+                </>
+              )}
             </div>
+
+            <BannerPickModal
+              onSave={onSaveBanner}
+              show={modal === HOME_MODAL.BANNER}
+              onClose={onCloseModal}
+            />
           </div>
         </div>
       </main>
@@ -211,6 +229,11 @@ export default function Home() {
 }
 
 Home.layout = Layout;
+
+/**
+ * Styles
+ * TODO: Seperate following sections into they own file
+ */
 
 const EditableDiv = styled.div`
   width: fit-content;
@@ -241,3 +264,14 @@ const Input = styled.input`
     outline: none;
   }
 `;
+
+/**
+ * Constants
+ */
+
+export const HEIGHT_LIMIT = 200;
+
+export enum HOME_MODAL {
+  NONE = 0,
+  BANNER = 1,
+}

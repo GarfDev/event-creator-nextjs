@@ -5,8 +5,7 @@ import Global from "@/styles/global.css";
 import { Page } from "@/types/page";
 
 import "bootstrap/dist/css/bootstrap.min.css";
-import 'react-date-range/dist/styles.css'; // main css file
-import 'react-date-range/dist/theme/default.css'; // theme css file
+import "react-datepicker/dist/react-datepicker.css";
 
 import "@/styles/base.css";
 
